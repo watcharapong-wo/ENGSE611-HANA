@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 3: Functions</title>
+    
+
+</head>
+<body>
+    <h1>JavaScript Functions</h1>
+    
+    <div>
+        <input type="text" id="studentName" placeholder="ชื่อนักศึกษา" value="สมชาย">
+        <input type="number" id="score" placeholder="คะแนน" value="85" min="0" max="100">
+        <input type="number" id="weight" placeholder="น้ำหนัก (กก.)" value="65" min="1">
+        <input type="number" id="height" placeholder="ส่วนสูง (ซม.)" value="170" min="50">
+        <button onclick="testFunctions()">ทดสอบ Functions</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        // Function ทักทายนักศึกษา
+        function greetStudent(name) {
+            return "สวัสดี " + name + "!";
+        }
+
+        // Function คำนวณเกรด
+        function calculateGrade(score) {
+            if (score >= 80) {
+                return "A";
+            } else if (score >= 70) {
+                return "B";
+            } else if (score >= 60) {
+                return "C";
+            } else if (score >= 50) {
+                return "D";
+            } else {
+                return "F";
+            }
+        }
+
+        // Function คำนวณค่าใช้จ่าย
+        function calculateExpenses(tuition, dorm, food, transport) {
+            let total = tuition + dorm + food + transport;
+            return {
+                monthly: total,
+                yearly: total * 12,
+                breakdown: { tuition, dorm, food, transport }
+            };
+        }
+
+        // Function คำนวณ BMI
+        function calculateBMI(weight, height) {
+            let h = height / 100;
+            let bmi = weight / (h * h);
+
+            if (bmi < 18.5) {
+                return `BMI = ${bmi.toFixed(2)} (ผอมเกินไป)`;
+            } else if (bmi < 24.9) {
+                return `BMI = ${bmi.toFixed(2)} (ปกติ)`;
+            } else if (bmi < 29.9) {
+                return `BMI = ${bmi.toFixed(2)} (ท้วม/เริ่มอ้วน)`;
+            } else {
+                return `BMI = ${bmi.toFixed(2)} (อ้วน)`;
+            }
+        }
+
+        // Function คำนวณค่าเฉลี่ยจากหลายตัวเลข
+        function calculateAverage(...numbers) {
+            let sum = numbers.reduce((acc, num) => acc + num, 0);
+            return sum / numbers.length;
+        }
+
+        // Function หลัก
+        function testFunctions() {
+            // ดึงค่าจาก input
+            let name = document.getElementById('studentName').value;
+            let score = parseInt(document.getElementById('score').value);
+            let weight = parseFloat(document.getElementById('weight').value);
+            let height = parseFloat(document.getElementById('height').value);
+
+            // เรียกใช้ Functions
+            let greeting = greetStudent(name);
+            let grade = calculateGrade(score);
+            let expenses = calculateExpenses(15000, 3000, 6000, 1500);
+            let bmiResult = calculateBMI(weight, height);
+            let avg = calculateAverage(80, 90, 70, 100); // ตัวอย่าง
+
+            // แสดงผลในหน้าเว็บ
+            document.getElementById('result').innerHTML = `
+                <h3>ผลลัพธ์:</h3>
+                <p><strong>คำทักทาย:</strong> ${greeting}</p>
+                <p><strong>คะแนน ${score} ได้เกรด:</strong> ${grade}</p>
+                <p><strong>${bmiResult}</strong></p>
+                <p><strong>ค่าเฉลี่ยคะแนนตัวอย่าง (80,90,70,100):</strong> ${avg.toFixed(2)}</p>
+                <h4>ค่าใช้จ่ายประมาณ:</h4>
+                <ul>
+                    <li>รายเดือน: ${expenses.monthly.toLocaleString()} บาท</li>
+                    <li>รายปี: ${expenses.yearly.toLocaleString()} บาท</li>
+                    <li>ค่าเทอม: ${expenses.breakdown.tuition.toLocaleString()} บาท</li>
+                    <li>ค่าหอพัก: ${expenses.breakdown.dorm.toLocaleString()} บาท</li>
+                    <li>ค่าอาหาร: ${expenses.breakdown.food.toLocaleString()} บาท</li>
+                    <li>ค่าเดินทาง: ${expenses.breakdown.transport.toLocaleString()} บาท</li>
+                </ul>
+            `;
+
+            // แสดงใน Console ด้วย
+            console.log("=== Function Results ===");
+            console.log("Greeting:", greeting);
+            console.log("Grade:", grade);
+            console.log("Expenses:", expenses);
+            console.log("BMI:", bmiResult);
+            console.log("Average:", avg);
+        }
+
+        // ทดสอบฟังก์ชันใน Console
+        console.log("=== Testing Functions ===");
+        console.log(greetStudent("นักศึกษา"));
+        console.log("Score 95 =", calculateGrade(95));
+        console.log("Score 45 =", calculateGrade(45));
+    </script>
+</body>
+</html>

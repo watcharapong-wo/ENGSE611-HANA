@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Exercise 6: Products Array</title>
+</head>
+<body>
+  <h1>JavaScript Arrays - Products</h1>
+
+  <div>
+    <input type="text" id="newProduct" placeholder="เพิ่มสินค้าใหม่">
+    <button onclick="addProduct()">เพิ่มสินค้า</button>
+    <button onclick="removeLastProduct()">ลบสินค้าล่าสุด</button>
+    <button onclick="searchProduct()">ค้นหาสินค้าที่มี 'o'</button>
+    <button onclick="showStatistics()">แสดงสถิติ</button>
+  </div>
+
+  <div id="productResult"></div>
+
+  <script>
+    // สร้าง Array สินค้า
+    let products = ["Mouse", "Keyboard", "Monitor", "Laptop"];
+    let prices = [500, 1200, 3500, 25000]; // ราคาตรงกับลำดับสินค้า
+
+    function displayProducts() {
+      let result = `<h3>รายการสินค้า (${products.length} ชิ้น):</h3><ol>`;
+      for (let i = 0; i < products.length; i++) {
+        result += `<li>${products[i]} - ราคา: ${prices[i]} บาท</li>`;
+      }
+      result += "</ol>";
+      return result;
+    }
+
+    function addProduct() {
+      const newItem = document.getElementById("newProduct").value.trim();
+      if (newItem === "") {
+        alert("กรุณากรอกชื่อสินค้า");
+        return;
+      }
+      products.push(newItem);
+      const randomPrice = Math.floor(Math.random() * 9000) + 1000; // ราคา 1,000-10,000
+      prices.push(randomPrice);
+      document.getElementById("newProduct").value = "";
+      updateDisplay();
+    }
+
+    function removeLastProduct() {
+      if (products.length === 0) {
+        alert("ไม่มีสินค้าแล้ว");
+        return;
+      }
+      const removed = products.pop();
+      const removedPrice = prices.pop();
+      updateDisplay();
+      console.log("ลบสินค้า:", removed, "ราคา:", removedPrice);
+    }
+
+    function searchProduct() {
+      const found = products.filter(p => p.toLowerCase().includes("o"));
+      let result = displayProducts();
+      result += `<h4>สินค้าที่มี 'o' ในชื่อ (${found.length} ชิ้น):</h4>`;
+      result += `<p style="color:blue">${found.join(", ")}</p>`;
+      document.getElementById("productResult").innerHTML = result;
+    }
+
+    function showStatistics() {
+      const total = prices.reduce((sum, price) => sum + price, 0);
+      const avg = total / prices.length;
+      const max = Math.max(...prices);
+      const min = Math.min(...prices);
+      const maxProduct = products[prices.indexOf(max)];
+
+      let result = displayProducts();
+      result += `
+        <h4>สถิติสินค้า:</h4>
+        <ul>
+          <li>จำนวนสินค้า: ${products.length}</li>
+          <li>ราคารวม: ${total.toLocaleString()} บาท</li>
+          <li>ราคาเฉลี่ย: ${avg.toFixed(2)} บาท</li>
+          <li>ราคาสูงสุด: ${max} บาท (${maxProduct})</li>
+          <li>ราคาต่ำสุด: ${min} บาท</li>
+        </ul>
+      `;
+      document.getElementById("productResult").innerHTML = result;
+    }
+
+    function updateDisplay() {
+      document.getElementById("productResult").innerHTML = displayProducts();
+    }
+
+    // แสดงเริ่มต้น
+    updateDisplay();
+  </script>
+</body>
+</html>
