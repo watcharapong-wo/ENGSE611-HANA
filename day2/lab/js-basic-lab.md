@@ -806,6 +806,7 @@ Control Structures ใช้ควบคุมการทำงานของ�
         <div id="gradeResult" style="margin-top: 10px;"></div>
     </div>
 
+
     <script>
         // ตัวแปรสำหรับเกมทายเลข
         let secretNumber = Math.floor(Math.random() * 100) + 1;
