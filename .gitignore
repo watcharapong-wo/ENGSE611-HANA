@@ -1,5 +1,7 @@
 resources
 day1/experiment
 day2/experiment
+day3/experiment
+day4/experiment
 git rm -r --cached day4/experiment/Homework-Labs/lab4.2/node_modules
 node_modules
