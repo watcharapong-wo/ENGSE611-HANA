@@ -1,6 +1,16 @@
+import FavoriteButton from './FavoriteButton';
+
 function RestaurantCard({ restaurant, onSelect }) {
+  const handleCardClick = (e) => {
+    // ไม่ให้เปิดรายละเอียดเมื่อคลิกปุ่ม favorite
+    if (e.target.closest('.favorite-button')) {
+      return;
+    }
+    onSelect(restaurant);
+  };
+
   return (
-    <div className="restaurant-card" onClick={() => onSelect(restaurant)}>
+    <div className="restaurant-card" onClick={handleCardClick}>
       <div className="restaurant-image">
         {restaurant.image ? (
           <img src={restaurant.image} alt={restaurant.name} />
@@ -9,6 +19,7 @@ function RestaurantCard({ restaurant, onSelect }) {
             <span>🍽️</span>
           </div>
         )}
+        <FavoriteButton restaurant={restaurant} />
       </div>
       <div className="restaurant-info">
         <h3 className="restaurant-name">{restaurant.name}</h3>

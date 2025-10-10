@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getRestaurantById, getRestaurantReviews } from '../services/api-static.js';
 import ReviewForm from './ReviewForm';
+import SocialShare from './SocialShare';
+import FavoriteButton from './FavoriteButton';
 
 function RestaurantDetail({ restaurantId, onBack }) {
   const [restaurant, setRestaurant] = useState(null);
@@ -81,22 +83,39 @@ function RestaurantDetail({ restaurantId, onBack }) {
         </div>
         
         <div className="restaurant-details">
-          <h1>{restaurant.name}</h1>
-          <p className="restaurant-type">{restaurant.type}</p>
-          <p className="restaurant-address">📍 {restaurant.address}</p>
-          {restaurant.rating && (
-            <div className="restaurant-rating">
-              <span className="stars">
-                {'⭐'.repeat(Math.floor(restaurant.rating))}
-              </span>
-              <span className="rating-number">({restaurant.rating.toFixed(1)})</span>
+          <div className="restaurant-detail-header">
+            <div className="restaurant-info-main">
+              <h1>{restaurant.name}</h1>
+              <p className="restaurant-type">{restaurant.type}</p>
+              <p className="restaurant-address">📍 {restaurant.address}</p>
+              {restaurant.rating && (
+                <div className="restaurant-rating">
+                  <span className="stars">
+                    {'⭐'.repeat(Math.floor(restaurant.rating))}
+                  </span>
+                  <span className="rating-number">({restaurant.rating.toFixed(1)})</span>
+                </div>
+              )}
+              {restaurant.priceRange && (
+                <div className="price-range">
+                  <span>ราคา: {restaurant.priceRange}</span>
+                </div>
+              )}
             </div>
-          )}
-          {restaurant.priceRange && (
-            <div className="price-range">
-              <span>ราคา: {restaurant.priceRange}</span>
+            
+            {/* เพิ่ม Favorite Button */}
+            <div className="restaurant-actions">
+              <FavoriteButton 
+                restaurant={restaurant} 
+                size="large"
+                className="detail-favorite-btn"
+              />
+              <SocialShare 
+                restaurant={restaurant}
+                review={null} // แชร์ข้อมูลร้านโดยทั่วไป
+              />
             </div>
-          )}
+          </div>
         </div>
       </div>
 
@@ -108,11 +127,33 @@ function RestaurantDetail({ restaurantId, onBack }) {
               <div key={index} className="review-item">
                 <div className="review-header">
                   <strong>{review.userName}</strong>
-                  <span className="review-rating">
-                    {'⭐'.repeat(review.rating)}
-                  </span>
+                  <div className="review-meta">
+                    <span className="review-rating">
+                      {'⭐'.repeat(review.rating)}
+                    </span>
+                    <SocialShare 
+                      restaurant={restaurant}
+                      review={review}
+                    />
+                  </div>
                 </div>
                 <p className="review-comment">{review.comment}</p>
+                
+                {/* แสดงรูปภาพในรีวิว */}
+                {review.images && review.images.length > 0 && (
+                  <div className="review-images">
+                    {review.images.map((image, imgIndex) => (
+                      <div key={imgIndex} className="review-image">
+                        <img 
+                          src={image.dataUrl} 
+                          alt={`รูปภาพรีวิว ${imgIndex + 1}`}
+                          loading="lazy"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
                 <small className="review-date">
                   {new Date(review.createdAt).toLocaleDateString('th-TH')}
                 </small>

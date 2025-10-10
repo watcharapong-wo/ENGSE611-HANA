@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ทดสอบ Backend API</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-button { background: #007bff; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        .result { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; background: #f9f9f9; }
+        .error { border-color: #dc3545; background: #f8d7da; }
+        .success { border-color: #28a745; background: #d4edda; }
+        pre { white-space: pre-wrap; word-wrap: break-word; }
+    </style>
+</head>
+<body>
+    <h1>🔧 ทดสอบ Restaurant Review Backend API</h1>
+    
+    <div>
+        <button class="test-button" onclick="testConnection()">🔗 ทดสอบการเชื่อมต่อ</button>
+        <button class="test-button" onclick="testRestaurants()">🍽️ ทดสอบดึงข้อมูลร้านอาหาร</button>
+        <button class="test-button" onclick="testSearch()">🔍 ทดสอบค้นหา</button>
+        <button class="test-button" onclick="testFilter()">📋 ทดสอบกรอง</button>
+        <button class="test-button" onclick="testReview()">📝 ทดสอบเพิ่มรีวิว</button>
+        <button class="test-button" onclick="clearResults()">🗑️ ล้างผลลัพธ์</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        
+        function addResult(title, content, isError = false) {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${isError ? 'error' : 'success'}`;
+            resultDiv.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${content}</pre>
+                <small>เวลา: ${new Date().toLocaleString('th-TH')}</small>
+            `;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        async function testConnection() {
+            try {
+                const response = await fetch(`${API_BASE}/restaurants`);
+                if (response.ok) {
+                    addResult('✅ การเชื่อมต่อ', 'Backend API ทำงานปกติ! Status: ' + response.status);
+                } else {
+                    addResult('❌ การเชื่อมต่อ', 'Backend ตอบสนองไม่ปกติ Status: ' + response.status, true);
+                }
+            } catch (error) {
+                addResult('❌ การเชื่อมต่อ', 'ไม่สามารถเชื่อมต่อ Backend ได้: ' + error.message, true);
+            }
+        }
+
+        async function testRestaurants() {
+            try {
+                const response = await fetch(`${API_BASE}/restaurants`);
+                const data = await response.json();
+                addResult('🍽️ ข้อมูลร้านอาหาร', JSON.stringify(data, null, 2));
+            } catch (error) {
+                addResult('❌ ข้อมูลร้านอาหาร', error.message, true);
+            }
+        }
+
+        async function testSearch() {
+            try {
+                const response = await fetch(`${API_BASE}/restaurants?search=ก๋วยเตี๋ยว`);
+                const data = await response.json();
+                addResult('🔍 ทดสอบค้นหา "ก๋วยเตี๋ยว"', JSON.stringify(data, null, 2));
+            } catch (error) {
+                addResult('❌ ทดสอบค้นหา', error.message, true);
+            }
+        }
+
+        async function testFilter() {
+            try {
+                const response = await fetch(`${API_BASE}/restaurants?category=อาหารไทย&rating=4`);
+                const data = await response.json();
+                addResult('📋 ทดสอบกรอง (อาหารไทย, rating >= 4)', JSON.stringify(data, null, 2));
+            } catch (error) {
+                addResult('❌ ทดสอบกรอง', error.message, true);
+            }
+        }
+
+        async function testReview() {
+            try {
+                const reviewData = {
+                    restaurantId: '1',
+                    name: 'ทดสอบ',
+                    rating: 5,
+                    comment: 'ทดสอบการเพิ่มรีวิว'
+                };
+                
+                const response = await fetch(`${API_BASE}/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reviewData)
+                });
+                
+                const data = await response.json();
+                addResult('📝 ทดสอบเพิ่มรีวิว', JSON.stringify(data, null, 2));
+            } catch (error) {
+                addResult('❌ ทดสอบเพิ่มรีวิว', error.message, true);
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        // ทดสอบอัตโนมัติเมื่อโหลดหน้า
+        window.onload = function() {
+            testConnection();
+        };
+    </script>
+</body>
+</html>

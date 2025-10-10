@@ -63,16 +63,33 @@ let STATIC_REVIEWS = [
     restaurantId: "1",
     userName: "คุณสมใจ",
     rating: 5,
-    comment: "อร่อยมาก! ก๋วยเตี๋ยวเรือรสชาติแท้"
+    comment: "อร่อยมาก! ก๋วยเตี๋ยวเรือรสชาติแท้",
+    images: [],
+    createdAt: "2024-01-15T10:30:00.000Z"
   },
   {
     id: "2",
     restaurantId: "1",
     userName: "คุณมาลี",
     rating: 4,
-    comment: "ดีครับ แต่รอนานหน่อย"
+    comment: "ดีครับ แต่รอนานหน่อย",
+    images: [],
+    createdAt: "2024-01-18T14:20:00.000Z"
   }
 ];
+
+// โหลดรีวิวเพิ่มเติมจาก localStorage
+const loadSavedReviews = () => {
+  try {
+    const savedReviews = JSON.parse(localStorage.getItem('restaurant_reviews') || '[]');
+    STATIC_REVIEWS = [...STATIC_REVIEWS, ...savedReviews];
+  } catch (error) {
+    console.warn('ไม่สามารถโหลดรีวิวที่บันทึกไว้ได้:', error);
+  }
+};
+
+// เรียกใช้เมื่อโหลดครั้งแรก
+loadSavedReviews();
 
 // Simulate API delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -132,10 +149,18 @@ export const addReview = async (reviewData) => {
     userName: reviewData.userName || reviewData.name,
     rating: Number(reviewData.rating),
     comment: reviewData.comment,
+    images: reviewData.images || [], // เพิ่มรองรับรูปภาพ
+    userId: reviewData.userId || null, // เพิ่ม user ID
     createdAt: new Date().toISOString()
   };
   
   STATIC_REVIEWS.push(newReview);
+  
+  // บันทึกรีวิวลงใน localStorage เพื่อให้คงอยู่
+  const savedReviews = JSON.parse(localStorage.getItem('restaurant_reviews') || '[]');
+  savedReviews.push(newReview);
+  localStorage.setItem('restaurant_reviews', JSON.stringify(savedReviews));
+  
   return newReview;
 };
 

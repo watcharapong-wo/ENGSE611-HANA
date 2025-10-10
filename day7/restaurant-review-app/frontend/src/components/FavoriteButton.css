@@ -1,0 +1,195 @@
+/* Favorite Button Styles */
+.favorite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  padding: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.favorite-button:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  transform: scale(1.1);
+}
+
+.favorite-button:active {
+  transform: scale(0.95);
+}
+
+.favorite-button.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.favorite-button.disabled:hover {
+  background-color: transparent;
+  transform: none;
+}
+
+/* Heart Icon */
+.heart-icon {
+  transition: all 0.3s ease;
+  color: #ef4444;
+}
+
+.favorite-button:not(.favorited) .heart-icon {
+  color: #9ca3af;
+}
+
+.favorite-button:not(.favorited):hover .heart-icon {
+  color: #ef4444;
+}
+
+.favorite-button.favorited .heart-icon {
+  color: #ef4444;
+  animation: heartBeat 0.6s ease-in-out;
+}
+
+.favorite-button.favorited .heart-path {
+  fill: currentColor;
+}
+
+/* Sizes */
+.favorite-button.small {
+  padding: 4px;
+}
+
+.favorite-button.small .heart-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.favorite-button.medium {
+  padding: 6px;
+}
+
+.favorite-button.medium .heart-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.favorite-button.large {
+  padding: 10px 16px;
+  border-radius: 25px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e5e7eb;
+  backdrop-filter: blur(10px);
+}
+
+.favorite-button.large:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+.favorite-button.large .heart-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.favorite-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.favorite-button.favorited .favorite-text {
+  color: #ef4444;
+}
+
+/* Animations */
+@keyframes heartBeat {
+  0% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.2);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  75% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Floating Effect */
+.favorite-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.favorite-button:hover::before {
+  width: 40px;
+  height: 40px;
+}
+
+.favorite-button.large:hover::before {
+  width: 60px;
+  height: 60px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .favorite-button.large {
+    padding: 8px 12px;
+  }
+  
+  .favorite-button.large .heart-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .favorite-text {
+    font-size: 12px;
+  }
+}
+
+/* Accessibility */
+.favorite-button:focus {
+  outline: 2px solid #ef4444;
+  outline-offset: 2px;
+}
+
+.favorite-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Card Integration */
+.restaurant-card .favorite-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.restaurant-card:hover .favorite-button {
+  background-color: rgba(255, 255, 255, 0.95);
+}
+
+/* Detail Page Integration */
+.restaurant-detail-header .favorite-button {
+  margin-left: auto;
+}
