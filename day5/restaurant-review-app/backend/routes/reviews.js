@@ -1,101 +1,70 @@
-const express = require('express');
-const router = express.Router();
-const { readJsonFile, writeJsonFile } = require('../utils/fileManager');
-const { validateReview } = require('../middleware/validation');
+import { Router } from "express";
+import { join } from "path";
+import { fileURLToPath } from "url";
+import { readJSON, writeJSON } from "../utils/fileManager.js";
+import { customAlphabet } from "nanoid";
 
-// GET /api/reviews/:restaurantId - ดึงรีวิวทั้งหมดของร้านนั้น
-router.get('/:restaurantId', async (req, res) => {
-  try {
-    const { restaurantId } = req.params;
-    const reviews = await readJsonFile('reviews.json');
-    
-    // TODO: กรองรีวิวเฉพาะร้านนี้
-    // const restaurantReviews = reviews.filter(r => r.restaurantId === parseInt(restaurantId));
-    // เรียงจากใหม่สุดไปเก่าสุด
-    // restaurantReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-    const restaurantReviews = reviews.filter(r => r.restaurantId === parseInt(restaurantId));
-    restaurantReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-    res.json({
-      success: true,
-      data: restaurantReviews,
-      total: restaurantReviews.length
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Error fetching reviews'
-    });
-  }
+const router = Router();
+const nanoid = customAlphabet("1234567890abcdefghijklmnopqrstuvwxyz", 10);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = __filename.substring(0, __filename.lastIndexOf("/"));
+const DB_DIR = join(__dirname, "..", "data");
+const REST_PATH = join(DB_DIR, "restaurants.json");
+const REV_PATH = join(DB_DIR, "reviews.json");
+
+async function getDB() {
+  return {
+    restaurants: (await readJSON(REST_PATH, [])) ?? [],
+    reviews: (await readJSON(REV_PATH, [])) ?? []
+  };
+}
+
+/* GET /api/restaurants/:id/reviews */
+router.get("/restaurants/:id/reviews", async (req, res) => {
+  const { restaurants, reviews } = await getDB();
+  if (!restaurants.find(r => r.id === req.params.id)) return res.status(404).json({ error: "Restaurant not found" });
+  const list = reviews.filter(v => v.restaurantId === req.params.id).sort((a, b) => b.date - a.date);
+  res.json(list);
 });
 
-// POST /api/reviews - เพิ่มรีวิวใหม่
-router.post('/', validateReview, async (req, res) => {
-  try {
-    const { restaurantId, userName, rating, comment, visitDate } = req.body;
-    
-    // อ่านข้อมูลปัจจุบัน
-    const reviews = await readJsonFile('reviews.json');
-    const restaurants = await readJsonFile('restaurants.json');
-    
-    // ตรวจสอบว่า restaurant ID มีอยู่จริงไหม
-    const restaurant = restaurants.find(r => r.id === parseInt(restaurantId));
-    if (!restaurant) {
-      return res.status(404).json({
-        success: false,
-        message: 'ไม่พบร้านอาหารนี้'
-      });
-    }
-    
-    // สร้างรีวิวใหม่
-    const newReview = {
-      id: Date.now(),
-      restaurantId: parseInt(restaurantId),
-      userName: userName.trim(),
-      rating: parseInt(rating),
-      comment: comment.trim(),
-      visitDate: visitDate || new Date().toISOString().split('T')[0],
-      createdAt: new Date().toISOString()
-    };
-    
-    reviews.push(newReview);
-    await writeJsonFile('reviews.json', reviews);
-    
-    // **สำคัญ: อัพเดท averageRating และ totalReviews ของร้าน**
-    // ขั้นตอนที่ 1: หารีวิวทั้งหมดของร้านนี้
-    const restaurantReviews = reviews.filter(r => r.restaurantId === parseInt(restaurantId));
-    
-    // ขั้นตอนที่ 2: คำนวณ averageRating ใหม่
-    // สูตร: รวมคะแนนทั้งหมด ÷ จำนวนรีวิว
-    const totalRating = restaurantReviews.reduce((sum, review) => sum + review.rating, 0);
-    const newAverageRating = totalRating / restaurantReviews.length;
-    
-    // ขั้นตอนที่ 3: อัพเดทข้อมูลร้าน
-    restaurant.averageRating = Math.round(newAverageRating * 10) / 10; // ปัดเศษ 1 ตำแหน่ง
-    restaurant.totalReviews = restaurantReviews.length;
-    
-    // ขั้นตอนที่ 4: บันทึกกลับไป restaurants.json
-    await writeJsonFile('restaurants.json', restaurants);
-    
-    res.status(201).json({
-      success: true,
-      message: 'เพิ่มรีวิวสำเร็จ',
-      data: newReview,
-      restaurant: {
-        id: restaurant.id,
-        name: restaurant.name,
-        averageRating: restaurant.averageRating,
-        totalReviews: restaurant.totalReviews
-      }
-    });
-  } catch (error) {
-    console.error('Error adding review:', error);
-    res.status(500).json({
-      success: false,
-      message: 'เกิดข้อผิดพลาดในการเพิ่มรีวิว'
-    });
-  }
+/* POST /api/restaurants/:id/reviews */
+router.post("/restaurants/:id/reviews", async (req, res) => {
+  const { restaurants, reviews } = await getDB();
+  if (!restaurants.find(r => r.id === req.params.id)) return res.status(404).json({ error: "Restaurant not found" });
+
+  const { name, text, rating = 0 } = req.body || {};
+  if (!name || !text) return res.status(400).json({ error: "name & text are required" });
+
+  const review = { id: nanoid(), restaurantId: req.params.id, name, text, rating: Number(rating) || 0, date: Date.now() };
+  await writeJSON(REV_PATH, [review, ...reviews]);
+
+  // อัปเดต updatedAt ของร้าน
+  const copy = [...restaurants];
+  const idx = copy.findIndex(r => r.id === req.params.id);
+  copy[idx] = { ...copy[idx], updatedAt: Date.now() };
+  await writeJSON(REST_PATH, copy);
+
+  res.status(201).json(review);
 });
 
-module.exports = router;
+/* PATCH /api/reviews/:rid */
+router.patch("/reviews/:rid", async (req, res) => {
+  const { reviews } = await getDB();
+  const idx = reviews.findIndex(v => v.id === req.params.rid);
+  if (idx === -1) return res.status(404).json({ error: "Review not found" });
+  reviews[idx] = { ...reviews[idx], ...req.body, date: Date.now() };
+  await writeJSON(REV_PATH, reviews);
+  res.json(reviews[idx]);
+});
+
+/* DELETE /api/reviews/:rid */
+router.delete("/reviews/:rid", async (req, res) => {
+  const { reviews } = await getDB();
+  const before = reviews.length;
+  const after = reviews.filter(v => v.id !== req.params.rid);
+  if (after.length === before) return res.status(404).json({ error: "Review not found" });
+  await writeJSON(REV_PATH, after);
+  res.json({ ok: true });
+});
+
+export default router;

@@ -1,44 +1,15 @@
-import { useState } from 'react';
-import RestaurantList from './components/RestaurantList';
-import RestaurantDetail from './components/RestaurantDetail';
-import './App.css';
+import React from "react";
+import RestaurantList from "./components/RestaurantList.jsx";
+import "./App.css";
 
-function App() {
-  const [selectedRestaurantId, setSelectedRestaurantId] = useState(null);
-
-  const handleSelectRestaurant = (id) => {
-    setSelectedRestaurantId(id);
-  };
-
-  const handleBack = () => {
-    setSelectedRestaurantId(null);
-  };
-
+export default function App(){
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>🍜 Restaurant Review</h1>
-        <p>ค้นหาและรีวิวร้านอาหารโปรดของคุณ</p>
+    <div className="container">
+      <header style={{padding:"18px 0"}}>
+        <h1>🍽️ Restaurant Reviews</h1>
+        <div className="sub">Full-stack demo — Express API + React</div>
       </header>
-
-      <main className="app-main">
-        {selectedRestaurantId ? (
-          <RestaurantDetail 
-            restaurantId={selectedRestaurantId}
-            onBack={handleBack}
-          />
-        ) : (
-          <RestaurantList 
-            onSelectRestaurant={handleSelectRestaurant}
-          />
-        )}
-      </main>
-
-      <footer className="app-footer">
-        <p>&copy; 2024 Restaurant Review App</p>
-      </footer>
+      <RestaurantList />
     </div>
   );
 }
-
-export default App;

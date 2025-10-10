@@ -1,0 +1,8 @@
+export function validateRestaurant(req, res, next) {
+  const { name, cuisine } = req.body || {};
+  const errors = [];
+  if (!name || String(name).trim().length < 2) errors.push("name is required (>=2 chars)");
+  if (cuisine && String(cuisine).length > 30) errors.push("cuisine too long");
+  if (errors.length) return res.status(400).json({ errors });
+  next();
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "bfgfsfvv",
+    "name": "ลาบอ้ายแดง",
+    "cuisine": "thai cuisine",
+    "location": "",
+    "photo": "",
+    "favorite": false,
+    "updatedAt": 1759662117822
+  },
+  {
+    "id": "r1abcd12",
+    "name": "Siam Garden",
+    "cuisine": "Thai",
+    "location": "Chiang Mai",
+    "photo": "",
+    "favorite": true,
+    "updatedAt": 1690600000000
+  },
+  {
+    "id": "r2pqrs90",
+    "name": "Napoli Slice",
+    "cuisine": "Italian",
+    "location": "Bangkok",
+    "photo": "",
+    "favorite": false,
+    "updatedAt": 1690601000000
+  }
+]

@@ -1,33 +1,20 @@
-const fs = require('fs').promises;
-const path = require('path');
+import { readFile, writeFile, mkdir } from "fs/promises";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
-const DATA_DIR = path.join(__dirname, '../data');
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-// อ่านไฟล์ JSON
-const readJsonFile = async (filename) => {
+export async function readJSON(absPath, fallback = null) {
   try {
-    const filePath = path.join(DATA_DIR, filename);
-    const data = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error(`Error reading ${filename}:`, error);
-    return [];
+    const buf = await readFile(absPath, "utf-8");
+    return JSON.parse(buf || "null") ?? fallback;
+  } catch {
+    return fallback;
   }
-};
+}
 
-// เขียนไฟล์ JSON
-const writeJsonFile = async (filename, data) => {
-  try {
-    const filePath = path.join(DATA_DIR, filename);
-    await fs.writeFile(filePath, JSON.stringify(data, null, 2));
-    return true;
-  } catch (error) {
-    console.error(`Error writing ${filename}:`, error);
-    return false;
-  }
-};
-
-module.exports = {
-  readJsonFile,
-  writeJsonFile
-};
+export async function writeJSON(absPath, data) {
+  const dir = absPath.replace(/\\/g, "/").split("/").slice(0, -1).join("/");
+  await mkdir(dir, { recursive: true });
+  await writeFile(absPath, JSON.stringify(data, null, 2), "utf-8");
+}

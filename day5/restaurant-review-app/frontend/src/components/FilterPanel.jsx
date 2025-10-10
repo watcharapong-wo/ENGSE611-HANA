@@ -1,67 +1,22 @@
-
-
-function FilterPanel({ onFilterChange, filters }) {
-  const categories = ['ทั้งหมด', 'อาหารไทย', 'อาหารญี่ปุ่น', 'อาหารอิตาเลียน', 'อาหารจีน', 'ฟาสต์ฟู้ด'];
-
-  const handleCategoryChange = (category) => {
-    onFilterChange({ 
-      category: category === 'ทั้งหมด' ? '' : category 
-    });
-  };
-
-
-  // TODO: เพิ่มฟังก์ชัน handleRatingChange
-  const handleRatingChange = (minRating) => {
-    onFilterChange({ minRating });
-  };
-
-  // TODO: เพิ่มฟังก์ชัน handlePriceChange
-  const handlePriceChange = (priceRange) => {
-    onFilterChange({ priceRange });
-  };
-
+import React from "react";
+export default function FilterPanel({ cuisines=[], value, onChange }){
+  const set = (p)=>onChange({ ...value, ...p });
   return (
-    <div className="filter-panel">
-      <div className="filter-group">
-        <label>หมวดหมู่:</label>
-        <select 
-          value={filters.category || 'ทั้งหมด'}
-          onChange={(e) => handleCategoryChange(e.target.value)}
-        >
-          {categories.map(cat => (
-            <option key={cat} value={cat}>{cat}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* TODO: เพิ่ม filter สำหรับ minRating */}
-      <div className="filter-group">
-        <label>ช่วงราคา:</label>
-        <select 
-          value={filters.priceRange || ''}
-          onChange={(e) => onFilterChange({ priceRange: e.target.value })}
-        >
-          <option value="">ทั้งหมด</option>
-          <option value="1">ถูก (฿)</option>
-          <option value="2">ปานกลาง (฿฿)</option>
-          <option value="3">แพง (฿฿฿)</option>
-        </select>
-      </div>
-      {/* TODO: เพิ่ม filter สำหรับ priceRange */}
-      <div className="filter-group">
-        <label>คะแนนเฉลี่ย:</label>
-        <select 
-          value={filters.minRating || ''}
-          onChange={(e) => onFilterChange({ minRating: e.target.value })}
-        >
-          <option value="">ทั้งหมด</option>
-          <option value="4">4 ดาวขึ้นไป</option>
-          <option value="5">5 ดาว</option>
-        </select>
-      </div>
-      
+    <div className="row wrap" style={{gap:8}}>
+      <select value={value.cuisine} onChange={e=>set({cuisine:e.target.value})}>
+        <option value="all">All cuisines</option>
+        {cuisines.map(c => <option key={c} value={c}>{c}</option>)}
+      </select>
+      <select value={value.sort} onChange={e=>set({sort:e.target.value})}>
+        <option value="name_asc">Sort: Name A→Z</option>
+        <option value="rating_desc">Sort: Rating (high)</option>
+        <option value="reviews_desc">Sort: Reviews (many)</option>
+        <option value="recent_desc">Sort: Recently updated</option>
+      </select>
+      <label className="row" style={{gap:6}}>
+        <input type="checkbox" checked={value.onlyFav} onChange={e=>set({onlyFav:e.target.checked})}/>
+        Favorites
+      </label>
     </div>
   );
 }
-
-export default FilterPanel;
