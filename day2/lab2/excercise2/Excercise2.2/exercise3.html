@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise 3: Functions</title>
+</head>
+<body>
+    <h1>JavaScript Functions</h1>
+    
+    <div>
+        <input type="text" id="studentName" placeholder="ชื่อนักศึกษา" value="สมชาย">
+        <input type="number" id="score" placeholder="คะแนน" value="85" min="0" max="100">
+        <br><br>
+        <input type="number" id="weight" placeholder="น้ำหนัก (กก.)" value="68" min="1">
+        <input type="number" id="height" placeholder="ส่วนสูง (เมตร)" step="0.01" value="1.70" min="0.5">
+        <br><br>
+        <button onclick="testFunctions()">ทดสอบ Functions</button>
+    </div>
+    
+    <div id="result"></div>
+
+    <script>
+        // Function Declaration - ประกาศ Function
+        function greetStudent(name) {
+            return "สวัสดี " + name + "!";
+        }
+
+        // Function สำหรับคำนวณเกรด
+        function calculateGrade(score) {
+            if (score >= 80) {
+                return "A";
+            } else if (score >= 70) {
+                return "B";
+            } else if (score >= 60) {
+                return "C";
+            } else if (score >= 50) {
+                return "D";
+            } else {
+                return "F";
+            }
+        }
+
+        // Function สำหรับคำนวณค่าใช้จ่าย
+        function calculateExpenses(tuition, dorm, food, transport) {
+            let total = tuition + dorm + food + transport;
+            return {
+                monthly: total,
+                yearly: total * 12,
+                breakdown: {
+                    tuition: tuition,
+                    dorm: dorm,
+                    food: food,
+                    transport: transport
+                }
+            };
+        }
+
+        // Function สำหรับคำนวณ BMI
+        function calculateBMI(weight, height) {
+            let bmi = weight / (height * height);
+            let category = "";
+            
+            if (bmi < 18.5) {
+                category = "น้ำหนักน้อย / ผอมเกินไป";
+            } else if (bmi < 23) {
+                category = "ปกติ (สุขภาพดี)";
+            } else if (bmi < 25) {
+                category = "ท้วม / น้ำหนักเกิน";
+            } else if (bmi < 30) {
+                category = "อ้วนระดับ 1";
+            } else {
+                category = "อ้วนระดับ 2 (อันตราย)";
+            }
+
+            return {
+                bmi: bmi.toFixed(2),
+                category: category
+            };
+        }
+
+        // Function ที่เรียกใช้ Functions อื่น
+        function testFunctions() {
+            // ดึงค่าจาก input
+            let name = document.getElementById('studentName').value;
+            let score = parseInt(document.getElementById('score').value);
+            let weight = parseFloat(document.getElementById('weight').value);
+            let height = parseFloat(document.getElementById('height').value);
+
+            // เรียกใช้ Functions
+            let greeting = greetStudent(name);
+            let grade = calculateGrade(score);
+            let expenses = calculateExpenses(15000, 3000, 6000, 1500);
+            let bmiResult = calculateBMI(weight, height);
+
+            // แสดงผล
+            document.getElementById('result').innerHTML = `
+                <h3>ผลลัพธ์:</h3>
+                <p><strong>คำทักทาย:</strong> ${greeting}</p>
+                <p><strong>คะแนน ${score} ได้เกรด:</strong> ${grade}</p>
+                <h4>ค่าใช้จ่ายประมาณ:</h4>
+                <ul>
+                    <li>รายเดือน: ${expenses.monthly.toLocaleString()} บาท</li>
+                    <li>รายปี: ${expenses.yearly.toLocaleString()} บาท</li>
+                    <li>ค่าเทอม: ${expenses.breakdown.tuition.toLocaleString()} บาท</li>
+                    <li>ค่าหอพัก: ${expenses.breakdown.dorm.toLocaleString()} บาท</li>
+                </ul>
+                <h4>ผลการคำนวณ BMI:</h4>
+                <p>BMI: ${bmiResult.bmi}</p>
+                <p>จัดอยู่ในกลุ่ม: ${bmiResult.category}</p>
+            `;
+            
+            // แสดงใน Console ด้วย
+            console.log("=== Function Results ===");
+            console.log("Greeting:", greeting);
+            console.log("Grade:", grade);
+            console.log("Expenses:", expenses);
+            console.log("BMI:", bmiResult);
+        }
+
+        // ทดสอบ Functions เบื้องต้น
+        console.log("=== Testing Functions ===");
+        console.log(greetStudent("นักศึกษา"));
+        console.log("Score 95 =", calculateGrade(95));
+        console.log("Score 45 =", calculateGrade(45));
+        console.log("BMI Example =", calculateBMI(68, 1.70));
+    </script>
+</body>
+</html>

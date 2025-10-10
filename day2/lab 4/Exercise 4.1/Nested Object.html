@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Nested Object Example</title>
+</head>
+<body>
+  <h1>ทดสอบ Object ซับซ้อน</h1>
+  <pre id="output"></pre> <!-- ไว้แสดงผล -->
+
+  <script>
+    const company = {
+      name: "ราชมงคลล้านนา",
+      founded: 2548,
+      address: {
+        street: "ห้วยแก้ว",
+        city: "เชียงใหม่",
+        country: "Thailand",
+        location: {
+          lat: 13.7563,
+          lng: 100.5018
+        }
+      },
+      departments: [
+        {
+          name: "Engineering",
+          manager: {
+            name: "ธนิต",
+            email: "watcharapong.wo@live.rmutl.ac.th"
+          },
+          employees: [
+            { id: 1, name: "ธนิต", role: "Frontend Developer" },
+            { id: 2, name: "ธนิต", role: "Backend Developer" }
+          ]
+        },
+        {
+          name: "HR",
+          manager: {
+            name: "วัชรพงษ์",
+            email: "watcharapong.wo@live.rmutl.ac.th"
+          },
+          employees: [
+            { id: 3, name: "ธนิต", role: "Recruiter" }
+          ]
+        }
+      ],
+      getCompanyInfo: function() {
+        return `${this.name} ก่อตั้งเมื่อปี ${this.founded} ที่อยู่ ${this.address.city}, ${this.address.country}`;
+      }
+    };
+
+    // แสดงผลบนหน้าเว็บ
+    document.getElementById("output").textContent =
+      company.getCompanyInfo() + "\n" +
+      "ตำแหน่งบริษัท: " + JSON.stringify(company.address.location) + "\n" +
+      "หัวหน้าแผนกวิศวกรรม: " + company.departments[0].manager.name + "\n" +
+      "พนักงาน HR: " + company.departments[1].employees.map(e => e.name).join(", ");
+  </script>
+</body>
+</html>
