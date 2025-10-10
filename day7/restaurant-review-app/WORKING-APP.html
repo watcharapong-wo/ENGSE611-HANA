@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Review App - WORKING VERSION</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .header h1 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #718096;
+            font-size: 1.1em;
+        }
+        
+        .search-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-select {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background: #5a67d8;
+        }
+        
+        .restaurants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .restaurant-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .restaurant-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .restaurant-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .restaurant-info {
+            padding: 20px;
+        }
+        
+        .restaurant-name {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #2d3748;
+        }
+        
+        .restaurant-cuisine {
+            color: #718096;
+            margin-bottom: 8px;
+        }
+        
+        .restaurant-rating {
+            color: #f6ad55;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .restaurant-description {
+            color: #4a5568;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .loading {
+            color: #3182ce;
+        }
+        
+        .error {
+            color: #e53e3e;
+        }
+        
+        .success {
+            color: #38a169;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 24px;
+            backdrop-filter: blur(10px);
+            transition: background-color 0.3s;
+        }
+        
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Dark mode */
+        .dark-mode {
+            background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+            color: #e2e8f0;
+        }
+        
+        .dark-mode .header,
+        .dark-mode .search-section,
+        .dark-mode .restaurant-card,
+        .dark-mode .status-message {
+            background: rgba(45, 55, 72, 0.95);
+            color: #e2e8f0;
+        }
+        
+        .dark-mode .restaurant-name {
+            color: #e2e8f0;
+        }
+        
+        .dark-mode .search-input,
+        .dark-mode .filter-select {
+            background: #4a5568;
+            border-color: #718096;
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ Restaurant Review</h1>
+            <p>เลือกร้านอาหาร และเขียนรีวิว</p>
+        </div>
+        
+        <div class="search-section">
+            <input type="text" class="search-input" placeholder="ค้นหาร้านอาหาร..." 
+                   oninput="searchRestaurants(this.value)">
+            
+            <div class="filters">
+                <select class="filter-select" onchange="filterRestaurants()">
+                    <option value="">ทุกประเภท</option>
+                    <option value="อาหารไทย">อาหารไทย</option>
+                    <option value="อาหารอิตาเลียน">อาหารอิตาเลียน</option>
+                    <option value="อาหารญี่ปุ่น">อาหารญี่ปุ่น</option>
+                    <option value="อาหารอเมริกัน">อาหารอเมริกัน</option>
+                </select>
+                
+                <select class="filter-select" onchange="filterRestaurants()">
+                    <option value="">ทุกช่วงราคา</option>
+                    <option value="$">$ ประหยัด</option>
+                    <option value="$$">$$ ปานกลาง</option>
+                    <option value="$$$">$$$ แพง</option>
+                    <option value="$$$$">$$$$ หรูหรา</option>
+                </select>
+                
+                <button class="btn" onclick="clearFilters()">ล้างตัวกรอง</button>
+            </div>
+        </div>
+        
+        <div id="status" class="status-message loading">
+            🔄 กำลังโหลดข้อมูลร้านอาหาร...
+        </div>
+        
+        <div id="restaurants" class="restaurants-grid"></div>
+    </div>
+
+    <script>
+        // ข้อมูลร้านอาหารแบบ Static (ไม่ต้องพึ่ง Backend)
+        const restaurantsData = [
+            {
+                id: "1",
+                name: "ร้านก๋วยเตี๋ยวเรือ",
+                cuisine: "อาหารไทย",
+                image: "https://images.unsplash.com/photo-1555126634-323283e090fa?w=400&h=300&fit=crop",
+                rating: 4.5,
+                priceRange: "$$",
+                description: "ก๋วยเตี๋ยวเรือแท้ๆ รสชาติเข้มข้น เครื่องแกงหอม เส้นเหนียวนุ่ม"
+            },
+            {
+                id: "2", 
+                name: "Pizza House",
+                cuisine: "อาหารอิตาเลียน",
+                image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&h=300&fit=crop",
+                rating: 4.2,
+                priceRange: "$$$",
+                description: "พิซซ่าแป้งบางกรอบ วัตถุดิบนำเข้าจากอิตาลี ชีสแท้ๆ"
+            },
+            {
+                id: "3",
+                name: "ร้านส้มตำป้าสมใส",
+                cuisine: "อาหารไทย",
+                image: "https://images.unsplash.com/photo-1562565652-a0d8f0c59eb4?w=400&h=300&fit=crop",
+                rating: 4.7,
+                priceRange: "$",
+                description: "ส้มตำแซ่บๆ สูตรต้นตำรับอีสาน เครื่องเคียงครบครัน"
+            },
+            {
+                id: "4",
+                name: "Sushi Zen",
+                cuisine: "อาหารญี่ปุ่น",
+                image: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=400&h=300&fit=crop",
+                rating: 4.8,
+                priceRange: "$$$$",
+                description: "ซูชิพรีเมียม ปลาสดนำเข้าจากซึกิจิ โตเกียว บรรยากาศหรูหรา"
+            },
+            {
+                id: "5",
+                name: "Burger Station",
+                cuisine: "อาหารอเมริกัน",
+                image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop",
+                rating: 4.0,
+                priceRange: "$$",
+                description: "เบอร์เกอร์เนื้อแท้ หนาใหญ่ พร้อมเฟรนช์ฟรายส์กรอบ"
+            },
+            {
+                id: "6",
+                name: "ร้านข้าวแกงป้าแดง",
+                cuisine: "อาหารไทย",
+                image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=400&h=300&fit=crop",
+                rating: 4.3,
+                priceRange: "$",
+                description: "ข้าวแกงตามสั่ง แกงจืด แกงเผ็ด กับข้าวสวยร้อนๆ"
+            }
+        ];
+        
+        let filteredRestaurants = [...restaurantsData];
+        let isDarkMode = false;
+        
+        function displayRestaurants(restaurants) {
+            const restaurantsDiv = document.getElementById('restaurants');
+            const statusDiv = document.getElementById('status');
+            
+            if (restaurants.length === 0) {
+                statusDiv.innerHTML = '<div class="error">😔 ไม่พบร้านอาหารที่ตรงกับเงื่อนไข</div>';
+                restaurantsDiv.innerHTML = '';
+                return;
+            }
+            
+            statusDiv.innerHTML = `<div class="success">✅ พบร้านอาหาร ${restaurants.length} ร้าน</div>`;
+            
+            restaurantsDiv.innerHTML = restaurants.map(restaurant => `
+                <div class="restaurant-card" onclick="showRestaurantDetails('${restaurant.id}')">
+                    <img src="${restaurant.image}" alt="${restaurant.name}" class="restaurant-image"
+                         onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
+                    <div class="restaurant-info">
+                        <div class="restaurant-name">${restaurant.name}</div>
+                        <div class="restaurant-cuisine">${restaurant.cuisine}</div>
+                        <div class="restaurant-rating">⭐ ${restaurant.rating}/5 | ${restaurant.priceRange}</div>
+                        <div class="restaurant-description">${restaurant.description}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function searchRestaurants(searchTerm) {
+            const filtered = restaurantsData.filter(restaurant =>
+                restaurant.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                restaurant.cuisine.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                restaurant.description.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            filteredRestaurants = filtered;
+            displayRestaurants(filtered);
+        }
+        
+        function filterRestaurants() {
+            const selects = document.querySelectorAll('.filter-select');
+            const cuisineFilter = selects[0].value;
+            const priceFilter = selects[1].value;
+            
+            let filtered = [...restaurantsData];
+            
+            if (cuisineFilter) {
+                filtered = filtered.filter(r => r.cuisine === cuisineFilter);
+            }
+            
+            if (priceFilter) {
+                filtered = filtered.filter(r => r.priceRange === priceFilter);
+            }
+            
+            filteredRestaurants = filtered;
+            displayRestaurants(filtered);
+        }
+        
+        function clearFilters() {
+            document.querySelector('.search-input').value = '';
+            document.querySelectorAll('.filter-select').forEach(select => select.value = '');
+            filteredRestaurants = [...restaurantsData];
+            displayRestaurants(restaurantsData);
+        }
+        
+        function showRestaurantDetails(id) {
+            const restaurant = restaurantsData.find(r => r.id === id);
+            if (restaurant) {
+                alert(`🍽️ ${restaurant.name}\n\n${restaurant.description}\n\n⭐ คะแนน: ${restaurant.rating}/5\n💰 ราคา: ${restaurant.priceRange}\n\nคลิก OK เพื่อกลับไปหน้าหลัก`);
+            }
+        }
+        
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
+            
+            const toggleBtn = document.querySelector('.theme-toggle');
+            toggleBtn.textContent = isDarkMode ? '☀️' : '🌙';
+            
+            // Save theme preference
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+        }
+        
+        // Initialize app
+        window.onload = function() {
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                toggleTheme();
+            }
+            
+            // Display all restaurants
+            setTimeout(() => {
+                displayRestaurants(restaurantsData);
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
